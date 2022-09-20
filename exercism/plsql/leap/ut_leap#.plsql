@@ -1,3 +1,24 @@
+create or replace package year# as
+
+  function is_leap(i_year number) return varchar2;
+  
+end year#;
+/
+
+create or replace package body year# as
+
+  function is_leap(i_year number) return varchar2 is
+  begin
+    if mod(i_year, 4) = 0 and mod(i_year, 100) != 0 or mod(i_year, 400) = 0 then
+      return 'Yes, ' || i_year ||' is a leap year';
+    else
+      return 'No, ' || i_year ||' is not a leap year';
+    end if;
+  end is_leap;
+  
+end year#;
+/
+
 create or replace package ut_year#
 is
   procedure run;
