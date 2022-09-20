@@ -1,3 +1,20 @@
+create or replace package gigasecond# is
+
+  function since(initialDt date) return date;
+
+end gigasecond#;
+/
+
+create or replace package body gigasecond# is
+
+  function since(initialDt date) return date is
+  begin
+    return trunc(initialDt + numtodsinterval(power(10, 9), 'second'));
+  end since;
+
+end gigasecond#;
+/
+
 create or replace package ut_gigasecond#
 is
   procedure run;
@@ -28,7 +45,7 @@ is
     test(i_descn => 'test_3', i_exp => to_date('1991-03-27', 'YYYY-MM-DD'), i_act => gigasecond#.since(to_date('1959-07-19', 'YYYY-MM-DD')));
     test(i_descn => 'test_time_with_seconds', i_exp => to_date('1991-03-28', 'YYYY-MM-DD'), i_act => gigasecond#.since(to_date('1959-07-19 23:59:59', 'YYYY-MM-DD HH24:Mi:SS')));
     ---- modify the test to test your 1 Gs anniversary
-    --test(i_descn => 'test_yourself', i_exp => to_date('AAAA-BB-CC', 'YYYY-MM-DD'), i_act => gigasecond#.since(to_date('XXXX-YY-ZZ', 'YYYY-MM-DD')));
+    test(i_descn => 'test_yourself', i_exp => to_date('2016-09-19', 'YYYY-MM-DD'), i_act => gigasecond#.since(to_date('1985-01-11', 'YYYY-MM-DD')));
   end run;
 end ut_gigasecond#;
 /
