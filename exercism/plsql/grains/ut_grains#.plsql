@@ -5,28 +5,16 @@ create or replace package grains# as
   
 end grains#;
 /
-
 create or replace package body grains# as
 
   function at_square(square number) return number is
-    i number;
-    grains number;
   begin
-    i := 1;
-    grains := 1;
-    loop
-      i := i + 1;
-      if i > square then
-        exit;
-      end if;
-      grains := grains * 2;
-    end loop;
-    return grains;
+    return power(2, square - 1);
   end at_square;
   
   function total return number is
   begin
-    return at_square(64) * 2 - 1;
+    return  power(2, 64) - 1;
   end total;
   
 end grains#;
