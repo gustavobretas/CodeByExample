@@ -1,3 +1,32 @@
+create or replace package raindrops# is
+
+  function convert(drops number) return varchar2;
+
+end raindrops#;
+/
+ 
+create or replace package body raindrops# is
+
+  function convert(drops number) return varchar2 as
+    res varchar2(100);
+  begin
+    if drops mod 3 = 0 then
+      res := res || 'Pling';
+    end if;
+    if drops mod 5 = 0 then
+      res := res || 'Plang';
+    end if;
+    if drops mod 7 = 0 then
+      res := res || 'Plong';
+    end if;
+    if res is null then
+      res := to_char(drops);
+    end if;
+    return res;
+  end convert;
+
+end raindrops#;
+/
 create or replace package ut_raindrops#
 is
   procedure run;
