@@ -1,3 +1,32 @@
+create or replace package series# is
+
+  function square_of_sums(n number) return number;
+  function sum_of_squares(n number) return number;
+  function diff_of_squares(n number) return number;
+
+end series#;
+/
+ 
+create or replace package body series# is
+
+  function square_of_sums(n number) return number as
+  begin
+    return power((n*(n+1))/2,2);
+  end square_of_sums;
+
+  function sum_of_squares(n number) return number as
+  begin
+    return (n*(n+1)*(2*n+1))/6;
+  end sum_of_squares;
+
+  function diff_of_squares(n number) return number as
+  begin
+    return square_of_sums(n) - sum_of_squares(n);
+  end diff_of_squares;
+
+end series#;
+/
+
 create or replace package ut_series#
 is
   procedure run;
