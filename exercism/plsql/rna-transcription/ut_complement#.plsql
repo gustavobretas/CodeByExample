@@ -1,31 +1,24 @@
 create or replace package complement# is
 
-  function of_dna(dna clob) return clob;
-  function of_rna(rna clob) return clob;
+  function of_dna(dna varchar2) return varchar2;
+  function of_rna(rna varchar2) return varchar2;
 
 end complement#;
 /
  
 create or replace package body complement# is
 
-  function of_dna(dna clob) return clob is
-    rna clob;
+  c_rna varchar2(4) := 'CGAU';
+  c_dna varchar2(4) := 'GCTA';
+
+  function of_dna(dna varchar2) return varchar2 is
   begin
-    rna := replace(dna, 'A', 'u');
-    rna := replace(rna, 'T', 'a');
-    rna := replace(rna, 'C', 'g');
-    rna := replace(rna, 'G', 'c');
-    return upper(rna);
+    return translate(dna, c_dna, c_rna);
   end of_dna;
 
-  function of_rna(rna clob) return clob is
-    dna clob;
+  function of_rna(rna varchar2) return varchar2 is
   begin
-    dna := replace(rna, 'U', 'a');
-    dna := replace(dna, 'A', 't');
-    dna := replace(dna, 'C', 'g');
-    dna := replace(dna, 'G', 'c');
-    return upper(dna);
+    return translate(rna, c_rna, c_dna);
   end of_rna;
 
 end complement#;
