@@ -1,3 +1,40 @@
+create or replace package binary# is
+
+  function to_decimal(input_number in varchar2) return number;
+
+end binary#;
+/
+ 
+create or replace package body binary# is
+
+  function to_decimal(input_number in varchar2) return number as
+    b_number number;
+    i number := 0;
+    len number := 0;
+    dec_value number := 0;
+    n_mod number := 0;
+  begin
+    if regexp_instr(input_number, '[a-zA-Z]+|\d[2-9]') > 0 then
+      raise_application_error(-20000, 'Invalid binary number');
+    end if;
+    b_number := to_number(input_number);
+    len := length(b_number);
+    while len >= 0 loop
+      n_mod := mod(b_number, 10);
+      dec_value := dec_value + (n_mod * power(2, i));
+      len := len - 1;
+      i := i + 1;
+      b_number := trunc(b_number / 10);
+    end loop;
+    return dec_value;
+    exception
+      when others then
+        return 0;
+  end to_decimal;
+
+end binary#;
+/
+
 create or replace package ut_binary#
 is
   procedure run;
