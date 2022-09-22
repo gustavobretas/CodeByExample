@@ -1,3 +1,36 @@
+create or replace package numeral# is
+
+  function to_roman(n_number in number) return varchar2;
+
+end numeral#;
+/
+ 
+create or replace package body numeral# is
+
+  function to_roman(n_number in number) return varchar2 as
+  begin
+    return
+      case
+        when n_number >= 1000 then 'M' || to_roman(n_number - 1000)
+        when n_number >= 900 then 'CM' || to_roman(n_number - 900)
+        when n_number >= 500 then 'D' || to_roman(n_number - 500)
+        when n_number >= 400 then 'CD' || to_roman(n_number - 400)
+        when n_number >= 100 then 'C' || to_roman(n_number - 100)
+        when n_number >= 90 then 'XC' || to_roman(n_number - 90)
+        when n_number >= 50 then 'L' || to_roman(n_number - 50)
+        when n_number >= 40 then 'XL' || to_roman(n_number - 40)
+        when n_number >= 10 then 'X' || to_roman(n_number - 10)
+        when n_number >= 9 then 'IX' || to_roman(n_number - 9)
+        when n_number >= 5 then 'V' || to_roman(n_number - 5)
+        when n_number >= 4 then 'IV' || to_roman(n_number - 4)
+        when n_number >= 1 then 'I' || to_roman(n_number - 1)
+        else ''
+      end;
+  end to_roman;
+
+end numeral#;
+/
+
 create or replace package ut_numeral#
 is
   procedure run;
