@@ -1,3 +1,36 @@
+create or replace package complement# is
+
+  function of_dna(dna clob) return clob;
+  function of_rna(rna clob) return clob;
+
+end complement#;
+/
+ 
+create or replace package body complement# is
+
+  function of_dna(dna clob) return clob is
+    rna clob;
+  begin
+    rna := replace(dna, 'A', 'u');
+    rna := replace(rna, 'T', 'a');
+    rna := replace(rna, 'C', 'g');
+    rna := replace(rna, 'G', 'c');
+    return upper(rna);
+  end of_dna;
+
+  function of_rna(rna clob) return clob is
+    dna clob;
+  begin
+    dna := replace(rna, 'U', 'a');
+    dna := replace(dna, 'A', 't');
+    dna := replace(dna, 'C', 'g');
+    dna := replace(dna, 'G', 'c');
+    return upper(dna);
+  end of_rna;
+
+end complement#;
+/
+
 create or replace package ut_complement#
 is
   procedure run;
