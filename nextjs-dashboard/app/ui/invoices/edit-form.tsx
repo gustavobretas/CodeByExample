@@ -14,7 +14,7 @@ import { useFormState } from 'react-dom';
 
 export default function EditInvoiceForm({
   invoice,
-  customers,
+  customers
 }: {
   invoice: InvoiceForm;
   customers: CustomerField[];
