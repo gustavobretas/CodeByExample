@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { signIn } from "@/auth";
-import Error from "next/error";
 import { join } from "path";
 import { writeFile } from "fs";
 
@@ -64,7 +63,7 @@ export async function createInvoice(prevInvoiceState: InvoiceState, formData: Fo
             `;
   } catch (error) {
     // If a database error occurs, return a more specific error.
-    return { message: "Database Error: Failed to Create Invoice." };
+    return { message: "Database Error: Failed to Create Invoice.", error: (error as Error).message };
   }
 
   // Revalidate the cache for the invoices page and redirect the user.
@@ -134,9 +133,6 @@ export async function authenticate(
   }
 }
 
-const MAX_FILE_SIZE = 50000000;
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
-
 const FormCustomerSchema = z.object({
   id: z.string(),
   name: z.string().min(5, { message: "Please enter a name." }),
@@ -181,7 +177,7 @@ export async function createCustomer(prevCustomerState: CustomerState, formData:
   const path = join(process.cwd(), "public/customers", image_url.name);
   
   writeFile(path, image, (err) => {
-    if (err) return { message: "Write File Error: Faild to Save the File", error: err.message };
+    if (err) return { message: "Write File Error: Faild to Save the File", error: (err as Error).message };
   });
 
   // Insert data into the database
@@ -192,10 +188,67 @@ export async function createCustomer(prevCustomerState: CustomerState, formData:
             `;
   } catch (error) {
     // If a database error occurs, return a more specific error.
-    return { message: "Database Error: Failed to Create Customer.", error: error.message };
+    return { message: "Database Error: Failed to Create Customer.", error: (error as Error).message };
   }
 
   // Revalidate the cache for the invoices page and redirect the user.
   revalidatePath("/dashboard/customers");
   redirect("/dashboard/customers");
+}
+
+export async function updateCustomer(id: string, prevCustomerState: CustomerState, formData: FormData) {
+  
+  const validatedFields = UpdateCustomer.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    image_url: formData.get("image_url") as unknown as File,
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Create Customer.",
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { name, email, image_url } = validatedFields.data;
+  
+  const bytes = await image_url.arrayBuffer();
+  const image = Buffer.from(bytes);
+  const path = join(process.cwd(), "public/customers", image_url.name);
+  
+  writeFile(path, image, (err) => {
+    if (err) return { message: "Write File Error: Faild to Save the File", error: (err as Error).message };
+  });
+
+  // Insert data into the database
+  try {
+    await sql`
+            UPDATE customers SET 
+              name = ${name},
+              email = ${email},
+              image_url = ${join("/customers", image_url.name).replace(/\\/g, '/')}
+            WHERE id = ${id}
+            `;
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    return { message: "Database Error: Failed to Create Customer.", error: (error as Error).message };
+  }
+
+  // Revalidate the cache for the invoices page and redirect the user.
+  revalidatePath("/dashboard/customers");
+  redirect("/dashboard/customers");
+}
+
+export async function deleteCustomer(id: string) {
+  try {
+    await sql`DELETE FROM customers WHERE id = ${id}`;
+    revalidatePath("/dashboard/customers");
+
+    return { message: "Customer Deleted." };
+  } catch (error) {
+    return { message: "Database Error: Failed to Delete Customer." };
+  }
 }

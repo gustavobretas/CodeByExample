@@ -1,6 +1,6 @@
-import { fetchCustomers } from "@/app/lib/data";
+import { fetchCustomerById } from "@/app/lib/data";
 import Breadcrumbs from "@/app/ui/common/breadcrumbs";
-import Form from "@/app/ui/invoices/create-form";
+import Form from "@/app/ui/customers/edit-form";
 import { Metadata } from 'next';
  
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function Page({ params }: { params: { id: string } }) {
     const id = params.id;
-    const customers = await fetchCustomers();
+    const customer = await fetchCustomerById(id);
 
     return (
         <main>
@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 {label: "Customers", href: "/dashboard/customers"},
                 {label: "Update Customer", href: `/dashboard/customers/${id}/edit`, active: true},
             ]} />
-            {/* <Form customers={customers} /> */}
+            <Form customer={customer} />
         </main>
     );
 }
